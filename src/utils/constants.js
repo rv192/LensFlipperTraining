@@ -78,6 +78,7 @@ export const SPEECH_KEYWORDS = {
   '一': DIRECTIONS.UP,     // 1点钟方向-上
   // '三': DIRECTIONS.RIGHT,  // 注释掉，避免与"三"→"上"的映射冲突
   '六': DIRECTIONS.DOWN,   // 6点钟方向-下
+  '6': DIRECTIONS.DOWN,    // 数字6 - 6点钟方向-下
   '九': DIRECTIONS.LEFT,   // 9点钟方向-左（对应开口向左）
 
   // 其他可能的表达
@@ -161,6 +162,25 @@ export const RESPONSIVE_GRID_CONFIG = {
     rows: 3,
     cols: 7
   }
+};
+
+// 特殊识别结果处理配置
+// 用于处理特定的误识别情况，优先级高于首字母匹配
+export const SPECIAL_RECOGNITION_OVERRIDES = {
+  // 完全匹配的特殊处理
+  'sha': DIRECTIONS.DOWN,    // "下"经常被识别为"Sha"，应该是下而不是上
+  'shot': DIRECTIONS.DOWN,   // 可能的"下"误识别
+  'show': DIRECTIONS.DOWN,   // 可能的"下"误识别
+
+  // 发音相似导致的误识别处理
+  '六': DIRECTIONS.LEFT,     // 用户说"右"，但被识别为"六"
+  '6': DIRECTIONS.LEFT,      // 用户说"右"，但被识别为数字"6"
+  'liu': DIRECTIONS.LEFT,    // 用户说"右"，但被识别为拼音"liu"
+
+  // 可以继续添加其他特殊情况
+  // 'xxx': DIRECTIONS.XXX,
+
+  // 注意：这里的key应该是小写，匹配时会转为小写比较
 };
 
 // API配置

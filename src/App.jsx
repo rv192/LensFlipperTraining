@@ -6,6 +6,9 @@ function App() {
   const [currentView, setCurrentView] = useState('home');
   const [sessionResults, setSessionResults] = useState(null);
 
+  // 检查是否启用调试模式
+  const isDebugMode = window.location.pathname.includes('/debug') || window.location.search.includes('debug=true');
+
   const handleSessionEnd = (results) => {
     console.log('App.jsx 接收到的训练结果:', results);
     setSessionResults(results);
@@ -24,6 +27,24 @@ function App() {
   const renderHome = () => (
     <div className="home-screen">
       <div className="home-content">
+        {/* 调试模式指示器 */}
+        {isDebugMode && (
+          <div style={{
+            position: 'fixed',
+            top: '10px',
+            right: '10px',
+            backgroundColor: '#ff6b6b',
+            color: 'white',
+            padding: '5px 10px',
+            borderRadius: '5px',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            zIndex: 1000
+          }}>
+            🐛 调试模式
+          </div>
+        )}
+
         <h1 className="app-title">翻转拍训练助手</h1>
         <p className="app-description">
           智能语音识别辅助视力训练
@@ -61,6 +82,18 @@ function App() {
         >
           开始训练
         </button>
+
+        {/* 调试模式提示 */}
+        {!isDebugMode && (
+          <div style={{
+            marginTop: '20px',
+            fontSize: '12px',
+            color: '#666',
+            textAlign: 'center'
+          }}>
+            💡 在URL后添加 /debug 可启用调试模式
+          </div>
+        )}
       </div>
     </div>
   );

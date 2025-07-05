@@ -4,16 +4,45 @@ import { getGridConfig, useResponsiveGrid, getViewportInfo, isMobileDevice } fro
 import './EyeChart.css';
 
 const EyeChart = ({ currentCell, onCellClick, isTraining, cellError, fontSize = 'medium', onCellDirectionReady }) => {
-  // 生成随机的E字母方向
-  const generateRandomDirection = () => {
+  // 生成均匀分布的方向数组
+  const generateBalancedDirections = (totalCells) => {
     const directions = Object.values(DIRECTIONS);
-    return directions[Math.floor(Math.random() * directions.length)];
+    const directionsArray = [];
+
+    // 计算每个方向应该出现的次数
+    const baseCount = Math.floor(totalCells / directions.length);
+    const remainder = totalCells % directions.length;
+
+    // 为每个方向分配基础数量
+    directions.forEach(direction => {
+      for (let i = 0; i < baseCount; i++) {
+        directionsArray.push(direction);
+      }
+    });
+
+    // 随机分配剩余的格子
+    for (let i = 0; i < remainder; i++) {
+      directionsArray.push(directions[i]);
+    }
+
+    // 打乱数组顺序
+    for (let i = directionsArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [directionsArray[i], directionsArray[j]] = [directionsArray[j], directionsArray[i]];
+    }
+
+    return directionsArray;
   };
 
   // 生成网格数据
   const generateGrid = (gridConfig = null) => {
     const config = gridConfig || getGridConfig();
+    const totalCells = config.rows * config.cols;
+    const balancedDirections = generateBalancedDirections(totalCells);
+
     const grid = [];
+    let directionIndex = 0;
+
     for (let row = 0; row < config.rows; row++) {
       const rowData = [];
       for (let col = 0; col < config.cols; col++) {
@@ -21,11 +50,20 @@ const EyeChart = ({ currentCell, onCellClick, isTraining, cellError, fontSize = 
           id: `${row}-${col}`,
           row,
           col,
-          direction: generateRandomDirection()
+          direction: balancedDirections[directionIndex++]
         });
       }
       grid.push(rowData);
     }
+
+    // 打印方向分布统计（仅在开发环境）
+    if (process.env.NODE_ENV === 'development') {
+      const directionCounts = {};
+      Object.values(DIRECTIONS).forEach(dir => directionCounts[dir] = 0);
+      balancedDirections.forEach(dir => directionCounts[dir]++);
+      console.log('🎯 方向分布统计:', directionCounts);
+    }
+
     return grid;
   };
 
@@ -114,10 +152,13 @@ const EyeChart = ({ currentCell, onCellClick, isTraining, cellError, fontSize = 
     }
   };
 
+  // 检查是否启用调试模式（URL包含/debug）
+  const isDebugMode = window.location.pathname.includes('/debug') || window.location.search.includes('debug=true');
+
   return (
     <div className="eye-chart">
-      {/* 调试信息 - 仅在开发环境显示 */}
-      {process.env.NODE_ENV === 'development' && (
+      {/* 调试信息 - 只在调试模式下显示 */}
+      {isDebugMode && (
         <div style={{
           position: 'absolute',
           top: '10px',

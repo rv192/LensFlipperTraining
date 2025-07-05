@@ -44,6 +44,9 @@ const TrainingSession = ({ onSessionEnd }) => {
     return localStorage.getItem('eyeChart-fontSize') || 'medium';
   });
 
+  // 检查是否启用调试模式（URL包含/debug）
+  const isDebugMode = window.location.pathname.includes('/debug') || window.location.search.includes('debug=true');
+
   const timerRef = useRef(null);
   const statsRef = useRef(stats);
   const timeLeftRef = useRef(timeLeft);
@@ -55,8 +58,10 @@ const TrainingSession = ({ onSessionEnd }) => {
   const addDebugLog = (message) => {
     // 使用logService同时输出到浏览器和服务端控制台
     const formattedMessage = logService.trainingLog(message);
-    // 同时保存到页面显示的调试日志中
-    setDebugLogs(prev => [...prev.slice(-4), formattedMessage]); // 只保留最新5条
+    // 只在调试模式下才保存到页面显示的调试日志中
+    if (isDebugMode) {
+      setDebugLogs(prev => [...prev.slice(-4), formattedMessage]); // 只保留最新5条
+    }
   };
 
   // 保持 ref 与 state 同步
@@ -832,7 +837,7 @@ const TrainingSession = ({ onSessionEnd }) => {
                   <p>🎤 无需按任何按钮，系统会自动识别您的语音</p>
                 </div>
               )}
-              {!alicloudConnected && alicloudConfigured && (
+              {isDebugMode && !alicloudConnected && alicloudConfigured && (
                 <div className="debug-controls">
                   <button
                     className="test-token-button"
@@ -908,8 +913,8 @@ const TrainingSession = ({ onSessionEnd }) => {
           </div>
         )}
 
-        {/* 调试信息显示 */}
-        {debugLogs.length > 0 && (
+        {/* 调试信息显示 - 只在调试模式下显示 */}
+        {isDebugMode && debugLogs.length > 0 && (
           <div className="debug-panel" style={{
             position: 'fixed',
             bottom: '10px',

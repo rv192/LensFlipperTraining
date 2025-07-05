@@ -1,5 +1,5 @@
 import { pinyin } from 'pinyin-pro';
-import { SPEECH_KEYWORDS, DIRECTIONS } from './constants.js';
+import { SPEECH_KEYWORDS, DIRECTIONS, SPECIAL_RECOGNITION_OVERRIDES } from './constants.js';
 
 /**
  * 拼音匹配工具类
@@ -84,9 +84,15 @@ export class PinyinMatcher {
       return null;
     }
 
-    const cleanText = text.trim();
+    const cleanText = text.trim().toLowerCase();
 
-    // 特殊处理：数字3
+    // 1. 特殊识别结果处理（最高优先级）
+    if (SPECIAL_RECOGNITION_OVERRIDES[cleanText]) {
+      console.log('✅ 特殊处理匹配:', cleanText, '->', SPECIAL_RECOGNITION_OVERRIDES[cleanText]);
+      return SPECIAL_RECOGNITION_OVERRIDES[cleanText];
+    }
+
+    // 2. 特殊处理：数字3
     if (cleanText === '3' || cleanText.includes('3')) {
       console.log('✅ 数字3匹配: "3" -> up');
       return DIRECTIONS.UP;

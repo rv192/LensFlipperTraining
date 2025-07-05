@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev-https": "ENABLE_HTTPS=true vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview-https": "ENABLE_HTTPS=true vite preview"
   },
   "dependencies": {
     "crypto-js": "^4.2.0",

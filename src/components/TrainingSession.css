@@ -3,16 +3,19 @@
   flex-direction: column;
   height: 100vh;
   background: #f5f5f5;
+  /* 为移动端浏览器地址栏预留空间 */
+  padding-top: env(safe-area-inset-top);
 }
 
 .training-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 20px;
+  padding: 12px 16px;
   background: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 10;
+  flex-shrink: 0;
 }
 
 .timer {
@@ -85,11 +88,12 @@
 }
 
 .training-controls {
-  padding: 20px;
+  padding: 16px;
   background: white;
-  margin: 10px;
+  margin: 8px;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 .feedback {
@@ -187,42 +191,135 @@
 @media (max-width: 768px) {
   .training-session {
     height: 100vh;
+    height: 100dvh; /* 动态视口高度，避免地址栏影响 */
     overflow: hidden;
+    /* 为移动端状态栏和地址栏预留更多空间，避免第一行字母被遮挡 */
+    padding-top: max(env(safe-area-inset-top), 30px);
   }
 
   .training-header {
-    padding: 8px 12px;
+    padding: 6px 10px;
     flex-shrink: 0;
   }
 
   .header-controls {
-    gap: 8px;
+    gap: 6px;
   }
 
   .timer-value {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .stats {
-    gap: 12px;
-    font-size: 11px;
+    gap: 10px;
+    font-size: 10px;
   }
 
   .training-controls {
-    margin: 3px;
-    padding: 10px;
+    margin: 2px;
+    padding: 8px;
     flex-shrink: 0;
   }
 
   .feedback {
-    font-size: 13px;
-    padding: 8px;
-    margin-bottom: 8px;
+    font-size: 12px;
+    padding: 6px;
+    margin-bottom: 6px;
+    min-height: 40px;
   }
 
   .start-button, .stop-button {
-    padding: 10px;
-    font-size: 15px;
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  /* 压缩语音模式选择器 */
+  .voice-mode-selector {
+    margin: 8px 0;
+    padding: 12px;
+  }
+
+  .mode-section h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .toggle-label {
+    font-size: 14px;
+  }
+
+  .mode-description {
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  /* 压缩阿里云状态面板 */
+  .alicloud-status-panel {
+    margin: 6px 0;
+    padding: 6px;
+  }
+
+  .voice-hint p {
+    font-size: 11px;
+    margin: 1px 0;
+  }
+
+  /* 进一步压缩语音控制区域 */
+  .voice-controls {
+    margin-top: 8px;
+  }
+
+  .record-button {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  /* 压缩测试模式控制 */
+  .test-mode-controls {
+    margin-top: 8px;
+    padding: 8px;
+  }
+
+  .direction-buttons {
+    gap: 6px;
+  }
+
+  .direction-button {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  /* 移动端训练状态下进一步压缩 */
+  .training-session.training-active .training-controls {
+    margin: 2px;
+    padding: 6px;
+  }
+
+  .training-session.training-active .feedback {
+    font-size: 11px;
+    padding: 4px;
+    margin-bottom: 4px;
+    min-height: 25px;
+  }
+
+  .training-session.training-active .stop-button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .training-session.training-active .vad-controls {
+    margin: 4px 0;
+    padding: 6px;
+  }
+
+  .training-session.training-active .alicloud-status-panel {
+    margin: 2px 0;
+    padding: 4px;
+  }
+
+  .training-session.training-active .voice-hint p {
+    font-size: 10px;
+    margin: 1px 0;
   }
 }
 
@@ -364,11 +461,56 @@
 
 /* VAD模式样式 */
 .voice-mode-selector {
-  margin: 20px 0;
-  padding: 20px;
+  margin: 12px 0;
+  padding: 16px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 训练状态下隐藏语音模式选择器 */
+.training-session.training-active .voice-mode-selector {
+  display: none;
+}
+
+/* 训练状态下压缩控制面板 */
+.training-session.training-active .training-controls {
+  margin: 4px;
+  padding: 8px;
+  transition: all 0.3s ease;
+}
+
+.training-session.training-active .feedback {
+  font-size: 12px;
+  padding: 6px;
+  margin-bottom: 6px;
+  min-height: 30px;
+}
+
+.training-session.training-active .stop-button {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+/* 训练状态下压缩阿里云控制面板 */
+.training-session.training-active .vad-controls {
+  margin: 6px 0;
+  padding: 8px;
+}
+
+.training-session.training-active .alicloud-status-panel {
+  margin: 4px 0;
+  padding: 6px;
+}
+
+.training-session.training-active .voice-hint {
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.training-session.training-active .voice-hint p {
+  font-size: 11px;
+  margin: 2px 0;
 }
 
 .mode-toggle {
@@ -427,8 +569,8 @@
 
 /* VAD控制面板 */
 .vad-controls {
-  margin: 20px 0;
-  padding: 20px;
+  margin: 12px 0;
+  padding: 16px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -628,8 +770,8 @@
 
 /* 阿里云状态面板 */
 .alicloud-status-panel {
-  margin: 20px 0;
-  padding: 15px;
+  margin: 12px 0;
+  padding: 12px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);

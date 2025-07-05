@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import fs from 'fs'
 
 // 日志中间件
 function logMiddleware() {
@@ -70,13 +69,16 @@ export default defineConfig({
   server: {
     host: true,
     port: 3000,
-    // 开发环境使用HTTPS，生产环境可以通过环境变量禁用
-    https: process.env.NODE_ENV === 'production' && process.env.DISABLE_HTTPS === 'true'
-      ? false
-      : {
-          key: fs.readFileSync('./certs/key.pem'),
-          cert: fs.readFileSync('./certs/cert.pem'),
-        }
+    // 默认使用HTTP，只有明确设置ENABLE_HTTPS=true时才启用HTTPS
+    https: process.env.ENABLE_HTTPS === 'true'
+      ? (() => {
+          const fs = require('fs');
+          return {
+            key: fs.readFileSync('./certs/key.pem'),
+            cert: fs.readFileSync('./certs/cert.pem'),
+          };
+        })()
+      : false
   },
   optimizeDeps: {
     exclude: ['sql.js']

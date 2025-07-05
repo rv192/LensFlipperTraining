@@ -153,3 +153,7 @@ certs/
 
 # Test files
 *test*.html
+
+# Configuration files with sensitive data
+src/utils/alicloudConfig.js
+

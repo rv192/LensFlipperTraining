@@ -698,7 +698,7 @@ const TrainingSession = ({ onSessionEnd }) => {
   }, []);
 
   return (
-    <div className="training-session">
+    <div className={`training-session ${isTraining ? 'training-active' : ''}`}>
       <div className="training-header">
         <div className="timer">
           <span className="timer-label">剩余时间:</span>

@@ -3,9 +3,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 16px;
   background: white;
-  margin: 10px;
+  margin: 8px;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -127,13 +127,13 @@
 /* 移动端优化 */
 @media (max-width: 768px) {
   .eye-chart {
-    padding: 10px;
-    margin: 5px;
+    padding: 6px;
+    margin: 3px;
     flex: 1;
   }
 
   .grid-container {
-    gap: min(1vw, 6px);
+    gap: min(1vw, 5px);
     width: 100%;
     height: 100%;
     justify-content: center;
@@ -141,15 +141,15 @@
   }
 
   .grid-row {
-    gap: min(1vw, 6px);
+    gap: min(1vw, 5px);
     justify-content: center;
   }
 
   .grid-cell {
-    width: min(15vw, 70px);
-    height: min(15vw, 70px);
-    min-width: 50px;
-    min-height: 50px;
+    width: min(15vw, 65px);
+    height: min(15vw, 65px);
+    min-width: 48px;
+    min-height: 48px;
     border-width: 2px;
   }
 
@@ -159,23 +159,23 @@
 /* 小屏手机优化 */
 @media (max-width: 480px) {
   .eye-chart {
-    padding: 8px;
-    margin: 3px;
+    padding: 4px;
+    margin: 2px;
   }
 
   .grid-container {
-    gap: min(1.2vw, 8px);
+    gap: min(1.2vw, 6px);
   }
 
   .grid-row {
-    gap: min(1.2vw, 8px);
+    gap: min(1.2vw, 6px);
   }
 
   .grid-cell {
-    width: min(18vw, 75px);
-    height: min(18vw, 75px);
-    min-width: 55px;
-    min-height: 55px;
+    width: min(18vw, 70px);
+    height: min(18vw, 70px);
+    min-width: 50px;
+    min-height: 50px;
     border-width: 2px;
   }
 

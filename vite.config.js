@@ -67,7 +67,7 @@ function logMiddleware() {
 export default defineConfig({
   plugins: [react(), logMiddleware()],
   server: {
-    host: true,
+    host: '0.0.0.0',
     port: 3000,
     // 允许所有主机访问，包括通过域名转发的请求
     allowedHosts: 'all',
@@ -83,7 +83,7 @@ export default defineConfig({
       : false
   },
   preview: {
-    host: true,
+    host: '0.0.0.0',
     port: 3000,
     // 预览模式也允许所有主机访问
     allowedHosts: 'all'

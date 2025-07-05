@@ -1,0 +1,288 @@
+.eye-chart {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: white;
+  margin: 10px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  min-height: 0; /* 允许flex子项收缩 */
+}
+
+.grid-container {
+  display: flex;
+  flex-direction: column;
+  gap: min(0.5vw, 4px);
+  max-width: 100%;
+  max-height: 100%;
+  width: fit-content;
+  height: fit-content;
+}
+
+.grid-row {
+  display: flex;
+  gap: min(0.5vw, 4px);
+}
+
+.grid-cell {
+  width: min(10vw, 60px);
+  height: min(10vw, 60px);
+  min-width: 45px;
+  min-height: 45px;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+}
+
+.grid-cell:hover {
+  background: #f0f0f0;
+}
+
+.grid-cell.active {
+  background: #007AFF;
+  border-color: #007AFF;
+  box-shadow: 0 0 15px rgba(0, 122, 255, 0.5);
+  animation: pulse 1s infinite;
+}
+
+.grid-cell.active .e-letter {
+  color: white;
+  font-weight: bold;
+}
+
+.grid-cell.training-mode {
+  pointer-events: none;
+}
+
+.cell-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.e-letter {
+  font-size: 24px; /* 默认大小，会被内联样式覆盖 */
+  font-weight: bold;
+  color: #333;
+  font-family: 'Courier New', monospace;
+  display: inline-block;
+  transition: all 0.3s ease;
+  transform-origin: center;
+  line-height: 1;
+}
+
+.direction-debug {
+  font-size: 8px;
+  color: #999;
+  margin-top: 2px;
+}
+
+/* E字母方向样式现在通过内联样式处理 */
+
+/* 错误状态动画 */
+.grid-cell.error {
+  background: #FF3B30;
+  border-color: #FF3B30;
+  animation: shake 0.5s ease-in-out;
+}
+
+.grid-cell.error .e-letter {
+  color: white;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .eye-chart {
+    padding: 10px;
+    margin: 5px;
+    flex: 1;
+  }
+
+  .grid-container {
+    gap: min(1vw, 6px);
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .grid-row {
+    gap: min(1vw, 6px);
+    justify-content: center;
+  }
+
+  .grid-cell {
+    width: min(15vw, 70px);
+    height: min(15vw, 70px);
+    min-width: 50px;
+    min-height: 50px;
+    border-width: 2px;
+  }
+
+  /* 字体大小现在通过FontSizeSelector控制 */
+}
+
+/* 小屏手机优化 */
+@media (max-width: 480px) {
+  .eye-chart {
+    padding: 8px;
+    margin: 3px;
+  }
+
+  .grid-container {
+    gap: min(1.2vw, 8px);
+  }
+
+  .grid-row {
+    gap: min(1.2vw, 8px);
+  }
+
+  .grid-cell {
+    width: min(18vw, 75px);
+    height: min(18vw, 75px);
+    min-width: 55px;
+    min-height: 55px;
+    border-width: 2px;
+  }
+
+  /* 字体大小现在通过FontSizeSelector控制 */
+}
+
+/* 横屏优化 */
+@media (orientation: landscape) and (max-height: 600px) {
+  .eye-chart {
+    padding: 5px;
+    margin: 2px;
+  }
+
+  .grid-container {
+    gap: min(0.8vh, 4px);
+  }
+
+  .grid-row {
+    gap: min(0.8vh, 4px);
+  }
+
+  .grid-cell {
+    width: min(8vh, 45px);
+    height: min(8vh, 45px);
+    min-width: 35px;
+    min-height: 35px;
+  }
+
+  /* 字体大小现在通过FontSizeSelector控制 */
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 360px) {
+  .eye-chart {
+    padding: 5px;
+    margin: 2px;
+  }
+
+  .grid-container {
+    gap: min(1.5vw, 10px);
+  }
+
+  .grid-row {
+    gap: min(1.5vw, 10px);
+  }
+
+  .grid-cell {
+    width: min(20vw, 70px);
+    height: min(20vw, 70px);
+    min-width: 50px;
+    min-height: 50px;
+    border-width: 2px;
+  }
+
+  /* 字体大小现在通过FontSizeSelector控制 */
+}
+
+/* 大屏幕优化 */
+@media (min-width: 1200px) {
+  .grid-cell {
+    width: min(6vw, 60px);
+    height: min(6vw, 60px);
+  }
+
+  /* 字体大小现在通过FontSizeSelector控制 */
+}
+
+/* 移动设备特定优化 */
+@media (hover: none) and (pointer: coarse) {
+  .grid-cell {
+    /* 移动设备上增大触摸目标 */
+    min-width: 55px;
+    min-height: 55px;
+  }
+
+  .grid-cell:hover {
+    /* 移动设备上禁用hover效果 */
+    background: white;
+  }
+
+  .grid-cell.active {
+    /* 移动设备上增强活跃状态的视觉效果 */
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 122, 255, 0.6);
+  }
+}
+
+/* iPhone SE 等小屏设备 */
+@media (max-width: 375px) and (max-height: 667px) {
+  .grid-cell {
+    width: min(22vw, 65px);
+    height: min(22vw, 65px);
+    min-width: 45px;
+    min-height: 45px;
+  }
+
+  /* 字体大小现在通过FontSizeSelector控制 */
+}
+
+/* iPhone 12/13/14 标准尺寸 */
+@media (min-width: 375px) and (max-width: 414px) {
+  .grid-cell {
+    width: min(16vw, 70px);
+    height: min(16vw, 70px);
+    min-width: 55px;
+    min-height: 55px;
+  }
+
+  /* 字体大小现在通过FontSizeSelector控制 */
+}

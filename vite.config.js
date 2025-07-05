@@ -70,10 +70,13 @@ export default defineConfig({
   server: {
     host: true,
     port: 3000,
-    https: {
-      key: fs.readFileSync('./certs/key.pem'),
-      cert: fs.readFileSync('./certs/cert.pem'),
-    }
+    // 开发环境使用HTTPS，生产环境可以通过环境变量禁用
+    https: process.env.NODE_ENV === 'production' && process.env.DISABLE_HTTPS === 'true'
+      ? false
+      : {
+          key: fs.readFileSync('./certs/key.pem'),
+          cert: fs.readFileSync('./certs/cert.pem'),
+        }
   },
   optimizeDeps: {
     exclude: ['sql.js']

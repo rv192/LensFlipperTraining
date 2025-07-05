@@ -76,13 +76,34 @@ npm run dev
 - **调试信息**: 显示详细的语音识别日志、网格信息等
 - **默认隐藏**: 正常使用时调试信息完全隐藏，保持界面简洁
 
-### 构建生产版本
+### 🚀 生产部署
+
+#### 方案1: Caddy代理部署（推荐）
+
+使用Caddy将HTTP应用代理为HTTPS，语音识别功能完全正常：
 
 ```bash
-npm run build
+# 1. 配置HTTP模式
+export NODE_ENV=production
+export DISABLE_HTTPS=true
+
+# 2. 启动应用
+npm run dev
+
+# 3. 配置Caddy（参考 Caddyfile.example）
+caddy run
 ```
 
-构建后的文件在 `dist/` 目录中，可以部署到任何静态文件服务器。
+#### 方案2: 静态文件部署
+
+```bash
+# 构建静态文件
+npm run build
+
+# 部署 dist/ 目录到任何静态文件服务器
+```
+
+详细部署指南请参考 [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ## 使用说明
 

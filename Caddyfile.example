@@ -1,0 +1,76 @@
+# Caddy配置示例 - 用于生产部署
+# 将此文件重命名为 Caddyfile 并根据实际情况修改
+
+# 方案1: 代理到开发服务器（适合开发/测试）
+your-domain.com {
+    # 反向代理到本地HTTP服务器
+    reverse_proxy localhost:3000
+    
+    # 启用压缩
+    encode gzip
+    
+    # 设置安全头
+    header {
+        # 启用HSTS
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        # 防止点击劫持
+        X-Frame-Options "SAMEORIGIN"
+        # 防止MIME类型嗅探
+        X-Content-Type-Options "nosniff"
+        # XSS保护
+        X-XSS-Protection "1; mode=block"
+        # 推荐人策略
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+    
+    # 日志记录
+    log {
+        output file /var/log/caddy/lens-flipper.log
+        format json
+    }
+}
+
+# 方案2: 静态文件服务（适合生产部署）
+# your-domain.com {
+#     # 服务静态文件
+#     root * /path/to/your/dist
+#     file_server
+#     
+#     # SPA路由支持
+#     try_files {path} /index.html
+#     
+#     # 启用压缩
+#     encode gzip
+#     
+#     # 缓存策略
+#     @static {
+#         path *.js *.css *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2
+#     }
+#     header @static Cache-Control "public, max-age=31536000, immutable"
+#     
+#     # HTML文件不缓存
+#     @html {
+#         path *.html
+#     }
+#     header @html Cache-Control "no-cache, no-store, must-revalidate"
+#     
+#     # 安全头（同上）
+#     header {
+#         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+#         X-Frame-Options "SAMEORIGIN"
+#         X-Content-Type-Options "nosniff"
+#         X-XSS-Protection "1; mode=block"
+#         Referrer-Policy "strict-origin-when-cross-origin"
+#     }
+# }
+
+# 方案3: 混合部署（开发+生产）
+# dev.your-domain.com {
+#     reverse_proxy localhost:3000
+# }
+# 
+# your-domain.com {
+#     root * /path/to/your/dist
+#     file_server
+#     try_files {path} /index.html
+# }

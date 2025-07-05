@@ -1,0 +1,263 @@
+.alicloud-config-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.alicloud-config-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.config-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.config-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 20px;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.close-button:hover {
+  background: #f0f0f0;
+}
+
+.config-content {
+  padding: 20px;
+}
+
+.config-section {
+  margin-bottom: 30px;
+}
+
+.config-section h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 16px;
+  border-bottom: 2px solid #007AFF;
+  padding-bottom: 5px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #007AFF;
+}
+
+.form-group input.valid {
+  border-color: #4CAF50;
+}
+
+.form-group input.invalid {
+  border-color: #ddd;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 5px;
+  color: #666;
+  font-size: 12px;
+}
+
+.secret-input {
+  position: relative;
+  display: flex;
+}
+
+.secret-input input {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.toggle-secret {
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #666;
+  transition: background 0.2s;
+}
+
+.toggle-secret:hover {
+  background: #e0e0e0;
+}
+
+.instructions {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  border-left: 4px solid #007AFF;
+}
+
+.instructions ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.instructions li {
+  margin-bottom: 8px;
+  color: #555;
+  font-size: 14px;
+}
+
+.config-status {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.status-indicator {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.status-indicator.valid {
+  background: #e8f5e8;
+  color: #4CAF50;
+}
+
+.status-indicator.invalid {
+  background: #fff3e0;
+  color: #FF9800;
+}
+
+.config-actions {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  border-top: 1px solid #eee;
+  justify-content: flex-end;
+}
+
+.config-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.save-button {
+  background: #007AFF;
+  color: white;
+}
+
+.save-button:hover:not(:disabled) {
+  background: #0056CC;
+}
+
+.test-button {
+  background: #4CAF50;
+  color: white;
+}
+
+.test-button:hover:not(:disabled) {
+  background: #45a049;
+}
+
+.cancel-button {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.cancel-button:hover {
+  background: #e0e0e0;
+}
+
+.config-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .alicloud-config-modal {
+    width: 95%;
+    margin: 10px;
+  }
+  
+  .config-header,
+  .config-content,
+  .config-actions {
+    padding: 15px;
+  }
+  
+  .config-actions {
+    flex-direction: column;
+  }
+  
+  .config-actions button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .secret-input {
+    flex-direction: column;
+  }
+  
+  .secret-input input {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+}

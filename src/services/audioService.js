@@ -1,4 +1,6 @@
 // 音效服务
+import logService from './logService';
+
 class AudioService {
   constructor() {
     this.sounds = {};
@@ -48,7 +50,7 @@ class AudioService {
           oscillator.stop(startTime + duration);
         });
       } catch (error) {
-        console.warn('无法播放正确音效:', error);
+        logService.warn('无法播放正确音效', error);
       }
     };
   }
@@ -86,14 +88,14 @@ class AudioService {
           oscillator.stop(startTime + duration);
         });
       } catch (error) {
-        console.warn('无法播放错误音效:', error);
+        logService.warn('无法播放错误音效', error);
       }
     };
   }
 
   // 播放正确音效
   playCorrect() {
-    console.log('播放正确音效');
+    logService.debug('播放正确音效');
     if (this.sounds.correct) {
       this.sounds.correct();
     }
@@ -101,7 +103,7 @@ class AudioService {
 
   // 播放错误音效
   playError() {
-    console.log('播放错误音效');
+    logService.debug('播放错误音效');
     if (this.sounds.error) {
       this.sounds.error();
     }
@@ -127,11 +129,11 @@ class AudioService {
 
   // 测试音效
   testSounds() {
-    console.log('测试正确音效...');
+    logService.debug('测试正确音效...');
     this.playCorrect();
-    
+
     setTimeout(() => {
-      console.log('测试错误音效...');
+      logService.debug('测试错误音效...');
       this.playError();
     }, 1000);
   }

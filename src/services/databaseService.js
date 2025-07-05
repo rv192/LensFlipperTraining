@@ -1,4 +1,6 @@
 // 简单的本地存储数据库服务
+import logService from './logService';
+
 class DatabaseService {
   constructor() {
     this.storageKey = 'lens_flipper_training_history';
@@ -32,7 +34,7 @@ class DatabaseService {
       localStorage.setItem(this.storageKey, JSON.stringify(history));
       return newSession;
     } catch (error) {
-      console.error('保存训练记录失败:', error);
+      logService.error('保存训练记录失败', error);
       return null;
     }
   }
@@ -43,7 +45,7 @@ class DatabaseService {
       const data = localStorage.getItem(this.storageKey);
       return data ? JSON.parse(data) : [];
     } catch (error) {
-      console.error('获取训练历史失败:', error);
+      logService.error('获取训练历史失败', error);
       return [];
     }
   }
@@ -90,7 +92,7 @@ class DatabaseService {
       this.initDatabase();
       return true;
     } catch (error) {
-      console.error('清除数据失败:', error);
+      logService.error('清除数据失败', error);
       return false;
     }
   }

@@ -144,3 +144,12 @@ Thumbs.db
 
 # Build outputs
 build/
+
+# SSL certificates
+certs/
+*.pem
+*.key
+*.crt
+
+# Test files
+*test*.html

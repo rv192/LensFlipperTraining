@@ -54,21 +54,8 @@ function App() {
             </div>
           </div>
         </div>
-        
-        <div className="instructions">
-          <h3>使用说明：</h3>
-          <ol>
-            <li>点击"开始训练"按钮</li>
-            <li>允许浏览器访问麦克风</li>
-            <li>看到高亮的格子后，说出E字母的方向</li>
-            <li>支持中文（上下左右）和英文（up/down/left/right）</li>
-            <li>答对时会播放愉快音效，答错时会播放提示音效</li>
-            <li>可以点击右上角音效按钮开启/关闭音效</li>
-            <li>训练结束后查看成绩统计</li>
-          </ol>
-        </div>
-        
-        <button 
+
+        <button
           className="start-training-button"
           onClick={startNewSession}
         >

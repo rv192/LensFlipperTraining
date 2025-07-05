@@ -34,13 +34,20 @@ const EyeChart = ({ currentCell, onCellClick, isTraining, cellError, fontSize = 
 
   // 获取指定格子的方向
   const getCellDirection = React.useCallback((cellId) => {
+    console.log(`🔍 getCellDirection 被调用，查找格子: ${cellId}`);
+    console.log(`🔍 当前网格大小: ${grid.length} 行`);
+
     for (const row of grid) {
       for (const cell of row) {
         if (cell.id === cellId) {
+          console.log(`✅ 找到格子 ${cellId}，方向: ${cell.direction}`);
           return cell.direction;
         }
       }
     }
+
+    console.error(`❌ 未找到格子 ${cellId}`);
+    console.error(`❌ 可用的格子ID:`, grid.flat().map(cell => cell.id));
     return null;
   }, [grid]);
 

@@ -1,0 +1,10 @@
+node_modules
+dist
+.git
+.gitignore
+Dockerfile
+README.md
+Caddyfile.example
+DEPLOYMENT.md
+SPEECH_RECOGNITION_IMPROVEMENTS.md
+ecosystem.config.js

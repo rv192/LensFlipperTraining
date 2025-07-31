@@ -90,7 +90,7 @@ const AlicloudConfig = ({ onConfigChange, onClose }) => {
                 placeholder="请输入AccessKey ID"
                 className={config.accessKeyId ? 'valid' : 'invalid'}
               />
-              <small>在阿里云控制台 > 访问控制 > 用户 > AccessKey管理中获取</small>
+              <small>在阿里云控制台 &gt; 访问控制 &gt; 用户 &gt; AccessKey管理中获取</small>
             </div>
 
             <div className="form-group">

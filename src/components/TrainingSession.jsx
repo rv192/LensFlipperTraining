@@ -9,7 +9,7 @@ import alicloudTokenService from '../services/alicloudTokenService';
 import logService from '../services/logService';
 import { ALICLOUD_CONFIG, validateConfig } from '../utils/alicloudConfig';
 import AlicloudConfig from './AlicloudConfig';
-import { TRAINING_CONFIG, DIRECTIONS } from '../utils/constants';
+import { TRAINING_CONFIG, DIRECTIONS, COMMON_MISTAKES } from '../utils/constants';
 import { getGridConfig } from '../utils/responsive';
 import './TrainingSession.css';
 
@@ -31,6 +31,7 @@ const TrainingSession = ({ onSessionEnd }) => {
   const [voiceVolume, setVoiceVolume] = useState(0);
   const [useAlicloud, setUseAlicloud] = useState(true); // 是否使用阿里云实时识别（默认开启）
   const [alicloudConnected, setAlicloudConnected] = useState(false); // 阿里云连接状态
+  const [showVolumeBar, setShowVolumeBar] = useState(false); // 是否显示音量条
   const [intermediateResult, setIntermediateResult] = useState(''); // 中间识别结果
   const [alicloudConfigured, setAlicloudConfigured] = useState(false); // 阿里云是否已配置
   const [showAlicloudConfig, setShowAlicloudConfig] = useState(false); // 显示配置界面
@@ -39,6 +40,7 @@ const TrainingSession = ({ onSessionEnd }) => {
   const [lastProcessedDirection, setLastProcessedDirection] = useState(''); // 最后处理的方向
   const [lastProcessedTime, setLastProcessedTime] = useState(0); // 最后处理的时间
   const [debugLogs, setDebugLogs] = useState([]); // 调试日志
+  const [lastDirectionInfo, setLastDirectionInfo] = useState({ direction: null, count: 0 }); // 记录上一个方向及其连续次数
   const [fontSize, setFontSize] = useState(() => {
     // 从localStorage读取保存的字体大小设置
     return localStorage.getItem('eyeChart-fontSize') || 'medium';
@@ -53,6 +55,7 @@ const TrainingSession = ({ onSessionEnd }) => {
   const isTrainingRef = useRef(isTraining);
   const currentCellRef = useRef(currentCell);
   const isProcessingResultRef = useRef(false);
+  const lastDirectionInfoRef = useRef(lastDirectionInfo);
 
   // 添加调试日志 - 同时输出到浏览器控制台和服务端控制台
   const addDebugLog = (message) => {
@@ -84,6 +87,10 @@ const TrainingSession = ({ onSessionEnd }) => {
   useEffect(() => {
     isProcessingResultRef.current = isProcessingResult;
   }, [isProcessingResult]);
+
+  useEffect(() => {
+    lastDirectionInfoRef.current = lastDirectionInfo;
+  }, [lastDirectionInfo]);
 
   // 同步音效设置
   useEffect(() => {
@@ -283,6 +290,7 @@ const TrainingSession = ({ onSessionEnd }) => {
         onConnectionClose: () => {
           setAlicloudConnected(false);
           setFeedback('连接已断开');
+          setShowVolumeBar(false);
         },
         onConnectionError: (error) => {
           setAlicloudConnected(false);
@@ -330,10 +338,20 @@ const TrainingSession = ({ onSessionEnd }) => {
             handleSpeechResult(direction, payload.result);
           } else {
             addDebugLog(`❌ 没有识别到方向词`);
+            // 记录失败案例
+            logService.failedCase({
+              text: payload.result,
+              reason: '未匹配到方向词',
+              timestamp: new Date().toISOString()
+            });
           }
+        },
+        onVolumeChange: (volume) => {
+          setVoiceVolume(volume);
+          if (!showVolumeBar) setShowVolumeBar(true);
         }
       });
-
+ 
       // 开始识别
       await alicloudSpeechService.startRecognition();
 
@@ -498,9 +516,22 @@ const TrainingSession = ({ onSessionEnd }) => {
     }
 
     addDebugLog(`🎯 当前格子方向: ${currentCurrentCell.direction}`);
-    addDebugLog(`🎯 方向比较: ${recognizedDirection} === ${currentCurrentCell.direction} = ${recognizedDirection === currentCurrentCell.direction}`);
+    
+    // 口误纠正逻辑
+    let finalDirection = recognizedDirection;
+    const targetDirection = currentCurrentCell.direction;
 
-    const isCorrect = recognizedDirection === currentCurrentCell.direction;
+    if (recognizedDirection !== targetDirection) {
+      // 检查识别出的方向是否是目标方向的常见口误
+      const possibleMistakes = COMMON_MISTAKES[targetDirection];
+      if (possibleMistakes && possibleMistakes.includes(recognizedDirection)) {
+        addDebugLog(`🔄 检测到口误! 用户说 "${recognizedDirection}", 但本意可能是 "${targetDirection}"。进行纠正。`);
+        finalDirection = targetDirection; // 纠正为目标方向
+      }
+    }
+    
+    addDebugLog(`🎯 方向比较: ${finalDirection} (最终) === ${targetDirection} (目标) = ${finalDirection === targetDirection}`);
+    const isCorrect = finalDirection === targetDirection;
 
     setStats(prev => {
       const newStats = {
@@ -528,16 +559,53 @@ const TrainingSession = ({ onSessionEnd }) => {
       setTimeout(() => {
         // 使用ref获取最新的训练状态
         if (isTrainingRef.current) {
-          addDebugLog(`🎲 生成下一个格子`);
+          addDebugLog(`🎲 生成下一个格子 (应用连续方向限制规则)`);
+          
+          const currentLastDirectionInfo = lastDirectionInfoRef.current;
+          addDebugLog(`🎲 当前方向历史: ${JSON.stringify(currentLastDirectionInfo)}`);
+
           let nextCell;
+          let nextDirection;
           let attempts = 0;
-          // 确保生成的下一个格子与当前格子不同
+          const maxAttempts = 10; // 防止无限循环的安全措施
+
+          // 循环直到找到一个有效的格子
           do {
             nextCell = generateRandomCell();
+            nextDirection = nextCell.direction;
             attempts++;
-          } while (nextCell.id === currentCurrentCell.id && attempts < 5);
 
-          addDebugLog(`🎲 下一个格子: ${JSON.stringify(nextCell)} (尝试${attempts}次)`);
+            addDebugLog(`🎲 尝试 ${attempts}: 生成格子 ${JSON.stringify(nextCell)}`);
+
+            // 检查是否需要强制切换方向
+            if (currentLastDirectionInfo.count === 2 && nextDirection === currentLastDirectionInfo.direction) {
+              addDebugLog(`🎲 方向 "${nextDirection}" 已连续出现2次，强制切换。`);
+              // 如果已经连续2次，且新方向与旧方向相同，则此格子无效，继续循环
+            } else {
+              // 格子有效，跳出循环
+              addDebugLog(`🎲 格子有效。`);
+              break;
+            }
+          } while (attempts < maxAttempts);
+
+          if (attempts >= maxAttempts) {
+            addDebugLog(`⚠️ 已尝试 ${maxAttempts} 次，仍未找到有效格子，将使用最后一次生成的结果。`);
+          }
+
+          addDebugLog(`🎲 最终下一个格子: ${JSON.stringify(nextCell)} (尝试${attempts}次)`);
+
+          // 更新方向历史记录
+          let newCount = 1;
+          let newDirection = nextDirection;
+
+          if (nextDirection === currentLastDirectionInfo.direction) {
+            newCount = currentLastDirectionInfo.count + 1;
+          }
+
+          const newLastDirectionInfo = { direction: newDirection, count: newCount };
+          setLastDirectionInfo(newLastDirectionInfo);
+          addDebugLog(`🎲 更新方向历史: ${JSON.stringify(newLastDirectionInfo)}`);
+
           setCurrentCell(nextCell);
 
           // 重置方向和时间状态，允许识别新格子的方向
@@ -835,6 +903,11 @@ const TrainingSession = ({ onSessionEnd }) => {
                 <div className="voice-hint">
                   <p>💡 直接说出方向：上、下、左、右</p>
                   <p>🎤 无需按任何按钮，系统会自动识别您的语音</p>
+                </div>
+              )}
+              {showVolumeBar && (
+                <div className="volume-bar-container">
+                  <div className="volume-bar" style={{ width: `${Math.min(voiceVolume * 200, 100)}%` }}></div>
                 </div>
               )}
               {isDebugMode && !alicloudConnected && alicloudConfigured && (

@@ -1,6 +1,5 @@
 // 阿里云实时语音识别服务
 import { SPEECH_KEYWORDS, DIRECTIONS } from '../utils/constants';
-import { pinyinMatcher } from '../utils/pinyinMatcher.js';
 import alicloudTokenService from './alicloudTokenService';
 import logService from './logService';
 
@@ -24,6 +23,7 @@ class AlicloudSpeechService {
     this.onSentenceBegin = null;
     this.onTranscriptionChanged = null;
     this.onSentenceEnd = null;
+    this.onVolumeChange = null;
     
     // 配置参数
     this.config = {
@@ -57,6 +57,7 @@ class AlicloudSpeechService {
     this.onSentenceBegin = callbacks.onSentenceBegin;
     this.onTranscriptionChanged = callbacks.onTranscriptionChanged;
     this.onSentenceEnd = callbacks.onSentenceEnd;
+    this.onVolumeChange = callbacks.onVolumeChange;
   }
 
   // 获取访问令牌
@@ -264,11 +265,23 @@ class AlicloudSpeechService {
         format: 'pcm',
         sample_rate: 16000,
         enable_intermediate_result: true,
-        enable_punctuation_prediction: true,
+        enable_punctuation_prediction: false,
         enable_inverse_text_normalization: true,
-        max_sentence_silence: 800,
+        max_sentence_silence: 400,
         enable_words: false,
-        disfluency: false
+        disfluency: false,
+        customization: {
+          hotwords: [
+            { word: '上', weight: 20 },
+            { word: '下', weight: 20 },
+            { word: '左', weight: 20 },
+            { word: '右', weight: 20 },
+            { word: '向上', weight: 20 },
+            { word: '向下', weight: 20 },
+            { word: '向左', weight: 20 },
+            { word: '向右', weight: 20 }
+          ]
+        }
       }
     };
 
@@ -341,9 +354,19 @@ class AlicloudSpeechService {
           const inputBuffer = event.inputBuffer;
           const inputData = inputBuffer.getChannelData(0);
 
+          // 计算音量
+          let sum = 0;
+          for (let i = 0; i < inputData.length; i++) {
+            sum += inputData[i] * inputData[i];
+          }
+          const volume = Math.sqrt(sum / inputData.length);
+          if (this.onVolumeChange) {
+            this.onVolumeChange(volume);
+          }
+
           // 转换为16位PCM
           const pcmData = this.float32ToPCM16(inputData);
-
+ 
           // 发送音频数据到阿里云
           if (this.websocket.readyState === WebSocket.OPEN) {
             this.websocket.send(pcmData);
@@ -453,74 +476,86 @@ class AlicloudSpeechService {
     }
   }
 
-  // 计算字符串相似度（编辑距离）
-  calculateSimilarity(str1, str2) {
-    const len1 = str1.length;
-    const len2 = str2.length;
-    const matrix = Array(len1 + 1).fill().map(() => Array(len2 + 1).fill(0));
+  // 工具函数：获取中文拼音首字母
+  getPinyinInitial(char) {
+    // 一个简化的汉字到拼音首字母的映射
+    // 实际应用中可能需要更完整的映射表或使用专门的库
+    const pinyinMap = {
+      '上': 'S', '下': 'X', '左': 'Z', '右': 'Y',
+      '商': 'S', '尚': 'S', '伤': 'S', '赏': 'S', '三': 'S',
+      '夏': 'X', '吓': 'X',
+      '做': 'Z', '作': 'Z', '坐': 'Z',
+      '有': 'Y', '又': 'Y',
+      // 可以继续扩展...
+    };
 
-    for (let i = 0; i <= len1; i++) matrix[i][0] = i;
-    for (let j = 0; j <= len2; j++) matrix[0][j] = j;
-
-    for (let i = 1; i <= len1; i++) {
-      for (let j = 1; j <= len2; j++) {
-        if (str1[i - 1] === str2[j - 1]) {
-          matrix[i][j] = matrix[i - 1][j - 1];
-        } else {
-          matrix[i][j] = Math.min(
-            matrix[i - 1][j] + 1,
-            matrix[i][j - 1] + 1,
-            matrix[i - 1][j - 1] + 1
-          );
-        }
-      }
+    // 如果是英文字母或数字，直接返回大写形式
+    if (/^[a-zA-Z0-9]+$/.test(char)) {
+      return char.charAt(0).toUpperCase();
     }
 
-    const maxLen = Math.max(len1, len2);
-    return maxLen === 0 ? 1 : (maxLen - matrix[len1][len2]) / maxLen;
+    // 返回映射的首字母，如果找不到则返回字符本身
+    return pinyinMap[char] || char.charAt(0).toUpperCase();
   }
 
-  // 解析方向词 - 简化版本，统一处理逻辑
+  // 解析方向词 - 混合匹配方案 + 口误纠正
   parseDirection(text) {
     if (!text) {
       logService.speechLog('parseDirection: 输入为空');
-      console.log('🎤 parseDirection: 输入为空');
       return null;
     }
 
-    const cleanText = text.trim().toLowerCase();
+    const cleanText = text.toLowerCase().trim();
     logService.speechLog('parseDirection 输入', { original: text, cleaned: cleanText });
-    console.log('🎤 parseDirection 输入', { original: text, cleaned: cleanText });
+
+    let parsedDirection = null;
 
     // 1. 直接关键词匹配 - 按长度排序，优先匹配长词组
+    // 这一步会处理所有预定义的映射，包括 "6" -> "右"
     const sortedKeywords = Object.entries(SPEECH_KEYWORDS)
       .sort(([a], [b]) => b.length - a.length);
 
-    console.log('🎤 开始关键词匹配，关键词列表:', sortedKeywords);
-
     for (const [keyword, direction] of sortedKeywords) {
-      const lowerKeyword = keyword.toLowerCase();
-      console.log(`🎤 检查关键词: "${keyword}" -> "${lowerKeyword}", 在 "${cleanText}" 中查找`);
-      if (cleanText.includes(lowerKeyword)) {
+      if (cleanText.includes(keyword.toLowerCase())) {
         logService.speechLog('✅ 关键词匹配成功', { keyword, direction });
-        console.log('🎤 ✅ 关键词匹配成功', { keyword, direction });
-        return direction;
+        parsedDirection = direction;
+        break;
       }
     }
 
-    console.log('🎤 关键词匹配失败，尝试拼音匹配');
+    // 2. 如果精确匹配失败，尝试首字母匹配
+    // 这一步用于处理发音相似的中文误识别，如 "右" -> "又"
+    if (!parsedDirection) {
+      const firstChar = cleanText.charAt(0);
+      const initial = this.getPinyinInitial(firstChar);
+      
+      logService.speechLog('尝试首字母匹配', { firstChar, initial });
 
-    // 2. 拼音匹配 - 处理同音字
-    const pinyinResult = pinyinMatcher.matchDirectionByPinyin(cleanText);
-    if (pinyinResult) {
-      logService.speechLog('✅ 拼音匹配成功', { text: cleanText, result: pinyinResult });
-      console.log('🎤 ✅ 拼音匹配成功', { text: cleanText, result: pinyinResult });
-      return pinyinResult;
+      // 定义方向词与首字母的映射
+      const directionInitials = {
+        'S': DIRECTIONS.UP,    // 上
+        'X': DIRECTIONS.DOWN,  // 下
+        'Z': DIRECTIONS.LEFT,  // 左
+        'Y': DIRECTIONS.RIGHT  // 右
+      };
+
+      const matchedDirection = directionInitials[initial];
+      if (matchedDirection) {
+        logService.speechLog('✅ 首字母匹配成功', { initial, direction: matchedDirection });
+        parsedDirection = matchedDirection;
+      }
     }
 
-    logService.speechLog('❌ 未匹配到方向词', cleanText);
-    console.log('🎤 ❌ 未匹配到方向词', cleanText);
-    return null;
+    if (!parsedDirection) {
+      logService.speechLog('❌ 未匹配到方向词', cleanText);
+      return null;
+    }
+
+    // 3. 口误纠正
+    // 注意：这个步骤需要知道当前的目标方向，所以它不能在 parseDirection 内部完成
+    // 它应该在调用 parseDirection 之后，由 handleSpeechResult 来执行
+    // 因此，这里我们直接返回解析出的方向
+    return parsedDirection;
   }
 
   // 工具函数：Float32转PCM16
@@ -559,6 +594,7 @@ class AlicloudSpeechService {
     }
     return this.taskId;
   }
-}
 
+}
+ 
 export default new AlicloudSpeechService();

@@ -1,7 +1,7 @@
 // E字母的四个方向
 export const DIRECTIONS = {
   UP: 'up',
-  DOWN: 'down', 
+  DOWN: 'down',
   LEFT: 'left',
   RIGHT: 'right'
 };
@@ -19,28 +19,28 @@ export const SPEECH_KEYWORDS = {
   // 基础方向词
   '上': DIRECTIONS.UP,
   '下': DIRECTIONS.DOWN,
-  '左': DIRECTIONS.RIGHT,  // 修复：说"左"对应开口向右
-  '右': DIRECTIONS.LEFT,   // 修复：说"右"对应开口向左
-
+  '左': DIRECTIONS.LEFT,   // E开口向左
+  '右': DIRECTIONS.RIGHT,  // E开口向右
+ 
   // 英文方向词
   'up': DIRECTIONS.UP,
   'down': DIRECTIONS.DOWN,
-  'left': DIRECTIONS.RIGHT,  // 修复：说"left"对应开口向右
-  'right': DIRECTIONS.LEFT,  // 修复：说"right"对应开口向左
-
+  'left': DIRECTIONS.LEFT,
+  'right': DIRECTIONS.RIGHT,
+ 
   // 完整词组（推荐使用，识别率更高）
   '向上': DIRECTIONS.UP,
   '向下': DIRECTIONS.DOWN,
-  '向左': DIRECTIONS.RIGHT,  // 修复：说"向左"对应开口向右
-  '向右': DIRECTIONS.LEFT,   // 修复：说"向右"对应开口向左
+  '向左': DIRECTIONS.LEFT,
+  '向右': DIRECTIONS.RIGHT,
   '往上': DIRECTIONS.UP,
   '往下': DIRECTIONS.DOWN,
-  '往左': DIRECTIONS.RIGHT,
-  '往右': DIRECTIONS.LEFT,
+  '往左': DIRECTIONS.LEFT,
+  '往右': DIRECTIONS.RIGHT,
   '朝上': DIRECTIONS.UP,
   '朝下': DIRECTIONS.DOWN,
-  '朝左': DIRECTIONS.RIGHT,
-  '朝右': DIRECTIONS.LEFT,
+  '朝左': DIRECTIONS.LEFT,
+  '朝右': DIRECTIONS.RIGHT,
 
   // 常见误识别词映射
   // "上"的常见误识别
@@ -60,26 +60,20 @@ export const SPEECH_KEYWORDS = {
   '吓': DIRECTIONS.DOWN,
 
   // "左"的常见误识别
-  '做': DIRECTIONS.RIGHT,
-  '作': DIRECTIONS.RIGHT,
-  '坐': DIRECTIONS.RIGHT,
-  '左边': DIRECTIONS.RIGHT,
-  '左侧': DIRECTIONS.RIGHT,
-  '左面': DIRECTIONS.RIGHT,
-
+  '做': DIRECTIONS.LEFT,
+  '作': DIRECTIONS.LEFT,
+  '坐': DIRECTIONS.LEFT,
+  '左边': DIRECTIONS.LEFT,
+  '左侧': DIRECTIONS.LEFT,
+  '左面': DIRECTIONS.LEFT,
+ 
   // "右"的常见误识别
-  '有': DIRECTIONS.LEFT,
-  '又': DIRECTIONS.LEFT,
-  '右边': DIRECTIONS.LEFT,
-  '右侧': DIRECTIONS.LEFT,
-  '右面': DIRECTIONS.LEFT,
-
-  // 数字表示（有些用户可能会说数字）
-  '一': DIRECTIONS.UP,     // 1点钟方向-上
-  // '三': DIRECTIONS.RIGHT,  // 注释掉，避免与"三"→"上"的映射冲突
-  '六': DIRECTIONS.DOWN,   // 6点钟方向-下
-  '6': DIRECTIONS.DOWN,    // 数字6 - 6点钟方向-下
-  '九': DIRECTIONS.LEFT,   // 9点钟方向-左（对应开口向左）
+  '有': DIRECTIONS.RIGHT,
+  '又': DIRECTIONS.RIGHT,
+  '6': DIRECTIONS.RIGHT,   // 数字6，常被误识别为"右"
+  '右边': DIRECTIONS.RIGHT,
+  '右侧': DIRECTIONS.RIGHT,
+  '右面': DIRECTIONS.RIGHT,
 
   // 其他可能的表达
   '顶': DIRECTIONS.UP,
@@ -90,6 +84,14 @@ export const SPEECH_KEYWORDS = {
   '北': DIRECTIONS.UP
 };
 
+// 常见口误配置
+// 用于处理用户口误，如把"左"说成"右"
+export const COMMON_MISTAKES = {
+  [DIRECTIONS.LEFT]: [DIRECTIONS.RIGHT], // 用户本意是"左"，但说成了"右"
+  [DIRECTIONS.RIGHT]: [DIRECTIONS.LEFT], // 用户本意是"右"，但说成了"左"
+  // 注意：上下方向通常不会混淆，所以不加入口误处理
+};
+ 
 // 训练配置
 export const TRAINING_CONFIG = {
   DURATION: 120, // 2分钟 = 120秒

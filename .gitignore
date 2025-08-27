@@ -157,3 +157,10 @@ certs/
 # Configuration files with sensitive data
 src/utils/alicloudConfig.js
 
+
+
+# AI Agent and Command directories
+agents/
+commands/
+
+CLAUDE.md

@@ -19,8 +19,8 @@ export const SPEECH_KEYWORDS = {
   // 基础方向词
   '上': DIRECTIONS.UP,
   '下': DIRECTIONS.DOWN,
-  '左': DIRECTIONS.LEFT,   // E开口向左
-  '右': DIRECTIONS.RIGHT,  // E开口向右
+  '左': DIRECTIONS.RIGHT,  // E开口向左
+  '右': DIRECTIONS.LEFT,   // E开口向右
  
   // 英文方向词
   'up': DIRECTIONS.UP,
@@ -85,10 +85,11 @@ export const SPEECH_KEYWORDS = {
 };
 
 // 常见口误配置
-// 用于处理用户口误，如把"左"说成"右"
+// 注意：在实际训练场景中，不应该存在口误，用户应该准确说出方向
+// 因此这里禁用口误纠正功能，确保用户必须准确说出目标方向
 export const COMMON_MISTAKES = {
-  [DIRECTIONS.LEFT]: [DIRECTIONS.RIGHT], // 用户本意是"左"，但说成了"右"
-  [DIRECTIONS.RIGHT]: [DIRECTIONS.LEFT], // 用户本意是"右"，但说成了"左"
+  // [DIRECTIONS.LEFT]: [DIRECTIONS.RIGHT], // 用户本意是"左"，但说成了"右"
+  // [DIRECTIONS.RIGHT]: [DIRECTIONS.LEFT], // 用户本意是"右"，但说成了"左"
   // 注意：上下方向通常不会混淆，所以不加入口误处理
 };
  
@@ -175,9 +176,9 @@ export const SPECIAL_RECOGNITION_OVERRIDES = {
   'show': DIRECTIONS.DOWN,   // 可能的"下"误识别
 
   // 发音相似导致的误识别处理
-  '六': DIRECTIONS.LEFT,     // 用户说"右"，但被识别为"六"
-  '6': DIRECTIONS.LEFT,      // 用户说"右"，但被识别为数字"6"
-  'liu': DIRECTIONS.LEFT,    // 用户说"右"，但被识别为拼音"liu"
+  '六': DIRECTIONS.RIGHT,     // 用户说"右"，但被识别为"六"
+  '6': DIRECTIONS.RIGHT,      // 用户说"右"，但被识别为数字"6"
+  'liu': DIRECTIONS.RIGHT,    // 用户说"右"，但被识别为拼音"liu"
 
   // 可以继续添加其他特殊情况
   // 'xxx': DIRECTIONS.XXX,

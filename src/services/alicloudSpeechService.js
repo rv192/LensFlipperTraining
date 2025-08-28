@@ -535,8 +535,8 @@ class AlicloudSpeechService {
       const directionInitials = {
         'S': DIRECTIONS.UP,    // 上
         'X': DIRECTIONS.DOWN,  // 下
-        'Z': DIRECTIONS.RIGHT, // 左（E开口向左）
-        'Y': DIRECTIONS.LEFT   // 右（E开口向右）
+        'Z': DIRECTIONS.LEFT,  // 左（箭头向左）
+        'Y': DIRECTIONS.RIGHT  // 右（箭头向右）
       };
 
       const matchedDirection = directionInitials[initial];

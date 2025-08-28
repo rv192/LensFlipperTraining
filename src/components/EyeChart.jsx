@@ -122,7 +122,7 @@ const EyeChart = ({ currentCell, onCellClick, isTraining, cellError, fontSize = 
     const isMobile = isMobileDevice();
     const customFontSize = isMobile ? fontConfig.mobile : fontConfig.desktop;
 
-    // 使用统一的E字符，通过CSS旋转来实现不同方向
+    // 使用E字母，通过CSS旋转来实现不同方向
     return (
       <div className="cell-content">
         <span
@@ -146,8 +146,8 @@ const EyeChart = ({ currentCell, onCellClick, isTraining, cellError, fontSize = 
     switch (direction) {
       case 'up': return '-90deg';
       case 'down': return '90deg';
-      case 'left': return '0deg';
-      case 'right': return '180deg';
+      case 'left': return '180deg';
+      case 'right': return '0deg';
       default: return '0deg';
     }
   };

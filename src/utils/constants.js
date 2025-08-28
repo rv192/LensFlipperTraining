@@ -19,8 +19,8 @@ export const SPEECH_KEYWORDS = {
   // 基础方向词
   '上': DIRECTIONS.UP,
   '下': DIRECTIONS.DOWN,
-  '左': DIRECTIONS.RIGHT,  // E开口向左
-  '右': DIRECTIONS.LEFT,   // E开口向右
+  '左': DIRECTIONS.LEFT,   // 箭头向左
+  '右': DIRECTIONS.RIGHT,  // 箭头向右
  
   // 英文方向词
   'up': DIRECTIONS.UP,

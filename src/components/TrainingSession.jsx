@@ -12,6 +12,7 @@ import AlicloudConfig from './AlicloudConfig';
 import { TRAINING_CONFIG, DIRECTIONS, COMMON_MISTAKES } from '../utils/constants';
 import { getGridConfig } from '../utils/responsive';
 import './TrainingSession.css';
+import packageJson from '../../package.json';
 
 const TrainingSession = ({ onSessionEnd }) => {
   const [isTraining, setIsTraining] = useState(false);
@@ -30,6 +31,7 @@ const TrainingSession = ({ onSessionEnd }) => {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [voiceVolume, setVoiceVolume] = useState(0);
   const [useAlicloud, setUseAlicloud] = useState(true); // 是否使用阿里云实时识别（默认开启）
+  const [appVersion] = useState(packageJson.version); // 应用版本号
   const [alicloudConnected, setAlicloudConnected] = useState(false); // 阿里云连接状态
   const [showVolumeBar, setShowVolumeBar] = useState(false); // 是否显示音量条
   const [intermediateResult, setIntermediateResult] = useState(''); // 中间识别结果
@@ -615,10 +617,8 @@ const TrainingSession = ({ onSessionEnd }) => {
 
           if (testMode) {
             setFeedback('测试模式：请点击下方按钮选择方向');
-          } else if (useAlicloud) {
-            setFeedback('请直接说出方向');
           } else {
-            setFeedback('请按住录音按钮说出高亮格子中E的方向');
+            setFeedback('请直接说出方向');
           }
         } else {
           addDebugLog(`❌ 训练已结束，不生成下一个格子`);
@@ -638,11 +638,7 @@ const TrainingSession = ({ onSessionEnd }) => {
       setTimeout(() => {
         setCellError(false);
         if (isTraining && !testMode) {
-          if (useAlicloud) {
-            setFeedback('请直接说出方向');
-          } else {
-            setFeedback('请按住录音按钮说出高亮格子中E的方向');
-          }
+          setFeedback('请直接说出方向');
         }
       }, 1500);
     }
@@ -794,6 +790,9 @@ const TrainingSession = ({ onSessionEnd }) => {
               {soundEnabled ? '🔊' : '🔇'}
             </button>
           </div>
+          <div className="version-info">
+            <span className="version-label">版本: {appVersion}</span>
+          </div>
         </div>
       </div>
 
@@ -831,55 +830,25 @@ const TrainingSession = ({ onSessionEnd }) => {
             <div className="mode-section">
               <h3>语音识别模式</h3>
 
-              <label className="mode-toggle">
-                <input
-                  type="radio"
-                  name="speechMode"
-                  checked={useAlicloud}
-                  onChange={() => setUseAlicloud(true)}
-                  disabled={!alicloudConfigured}
-                />
-                <span className="radio-mark"></span>
-                <span className="toggle-label">
-                  ⚡ 阿里云实时识别（推荐）
-                  {!alicloudConfigured && <span className="config-required">（需配置）</span>}
-                </span>
-              </label>
-
-              <label className="mode-toggle">
-                <input
-                  type="radio"
-                  name="speechMode"
-                  checked={!useAlicloud}
-                  onChange={() => setUseAlicloud(false)}
-                />
-                <span className="radio-mark"></span>
-                <span className="toggle-label">🎤 Groq Whisper</span>
-              </label>
-
               <div className="mode-description">
-                {useAlicloud ? (
-                  alicloudConfigured ? (
-                    <div className="alicloud-status">
-                      <span className={`status-dot ${alicloudConnected ? 'connected' : 'disconnected'}`}></span>
-                      {alicloudConnected ? '已连接阿里云服务' : '未连接'}
-                      {intermediateResult && (
-                        <div className="intermediate-result">识别中: {intermediateResult}</div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="config-prompt">
-                      请先配置阿里云访问凭证
-                      <button
-                        className="config-button"
-                        onClick={() => setShowAlicloudConfig(true)}
-                      >
-                        配置
-                      </button>
-                    </div>
-                  )
+                {alicloudConfigured ? (
+                  <div className="alicloud-status">
+                    <span className={`status-dot ${alicloudConnected ? 'connected' : 'disconnected'}`}></span>
+                    {alicloudConnected ? '已连接阿里云服务' : '未连接'}
+                    {intermediateResult && (
+                      <div className="intermediate-result">识别中: {intermediateResult}</div>
+                    )}
+                  </div>
                 ) : (
-                  '使用Groq Whisper API，需要按住录音按钮说话'
+                  <div className="config-prompt">
+                    请先配置阿里云访问凭证
+                    <button
+                      className="config-button"
+                      onClick={() => setShowAlicloudConfig(true)}
+                    >
+                      配置
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -934,26 +903,6 @@ const TrainingSession = ({ onSessionEnd }) => {
           </div>
         )}
 
-        {!testMode && isTraining && !useAlicloud && (
-          <div className="voice-controls">
-            <button
-              className={`record-button ${isRecording ? 'recording' : ''}`}
-              onMouseDown={startRecording}
-              onMouseUp={stopRecordingAndRecognize}
-              onTouchStart={startRecording}
-              onTouchEnd={stopRecordingAndRecognize}
-              disabled={isListening}
-            >
-              {isRecording ? '🔴 录音中...' : '🎤 按住录音'}
-            </button>
-            {isListening && (
-              <div className="processing-indicator">
-                <div className="pulse"></div>
-                正在识别...
-              </div>
-            )}
-          </div>
-        )}
 
         {testMode && isTraining && (
           <div className="test-mode-controls">

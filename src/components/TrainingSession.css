@@ -59,7 +59,13 @@
   align-items: center;
 }
 
-.sound-toggle {
+.direction-labels-control {
+  display: flex;
+  align-items: center;
+}
+
+.sound-toggle,
+.direction-labels-toggle {
   background: none;
   border: none;
   font-size: 20px;
@@ -74,15 +80,18 @@
   height: 40px;
 }
 
-.sound-toggle:hover {
+.sound-toggle:hover,
+.direction-labels-toggle:hover {
   background: rgba(0, 122, 255, 0.1);
 }
 
-.sound-toggle.enabled {
+.sound-toggle.enabled,
+.direction-labels-toggle.enabled {
   color: #007AFF;
 }
 
-.sound-toggle.disabled {
+.sound-toggle.disabled,
+.direction-labels-toggle.disabled {
   color: #999;
   opacity: 0.6;
 }

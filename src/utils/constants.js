@@ -103,23 +103,29 @@ export const TRAINING_CONFIG = {
 
 // E字母大小配置
 export const FONT_SIZE_CONFIG = {
+  extraSmall: {
+    name: '超小',
+    desktop: '12px',
+    mobile: '10px',
+    scale: 0.4
+  },
   small: {
     name: '小',
-    desktop: '18px',
-    mobile: '16px',
-    scale: 0.7
+    desktop: '16px',
+    mobile: '14px',
+    scale: 0.6
   },
   medium: {
     name: '中',
-    desktop: '24px',
-    mobile: '20px',
-    scale: 1.0
+    desktop: '20px',
+    mobile: '18px',
+    scale: 0.8
   },
   large: {
     name: '大',
-    desktop: '32px',
-    mobile: '28px',
-    scale: 1.4
+    desktop: '26px',
+    mobile: '22px',
+    scale: 1.0
   }
 };
 

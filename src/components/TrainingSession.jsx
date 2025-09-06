@@ -47,6 +47,10 @@ const TrainingSession = ({ onSessionEnd }) => {
     // 从localStorage读取保存的字体大小设置
     return localStorage.getItem('eyeChart-fontSize') || 'medium';
   });
+  const [showDirectionLabels, setShowDirectionLabels] = useState(() => {
+    // 从localStorage读取是否显示方向字母的设置，默认不显示
+    return localStorage.getItem('eyeChart-showDirectionLabels') === 'true';
+  });
 
   // 检查是否启用调试模式（URL包含/debug）
   const isDebugMode = window.location.pathname.includes('/debug') || window.location.search.includes('debug=true');
@@ -170,6 +174,16 @@ const TrainingSession = ({ onSessionEnd }) => {
     // 保存到localStorage
     localStorage.setItem('eyeChart-fontSize', newSize);
     console.log('字体大小已更改为:', newSize);
+  };
+
+  // 处理方向标签显示切换
+  const toggleDirectionLabels = () => {
+    setShowDirectionLabels(prev => {
+      const newValue = !prev;
+      localStorage.setItem('eyeChart-showDirectionLabels', newValue);
+      console.log('方向标签显示已设置为:', newValue);
+      return newValue;
+    });
   };
 
   // 生成随机格子 - 从网格中选择已存在的格子
@@ -793,6 +807,15 @@ const TrainingSession = ({ onSessionEnd }) => {
           <div className="version-info">
             <span className="version-label">版本: {appVersion}</span>
           </div>
+          <div className="direction-labels-control">
+            <button
+              className={`direction-labels-toggle ${showDirectionLabels ? 'enabled' : 'disabled'}`}
+              onClick={toggleDirectionLabels}
+              title={showDirectionLabels ? '隐藏方向字母' : '显示方向字母'}
+            >
+              {showDirectionLabels ? '👁️' : '🙈'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -802,6 +825,7 @@ const TrainingSession = ({ onSessionEnd }) => {
         cellError={cellError}
         fontSize={fontSize}
         onCellDirectionReady={handleCellDirectionReady}
+        showDirectionLabels={showDirectionLabels}
       />
 
       <div className="training-controls">

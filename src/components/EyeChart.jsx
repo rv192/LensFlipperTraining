@@ -3,7 +3,7 @@ import { DIRECTIONS, FONT_SIZE_CONFIG } from '../utils/constants';
 import { getGridConfig, useResponsiveGrid, getViewportInfo, isMobileDevice } from '../utils/responsive';
 import './EyeChart.css';
 
-const EyeChart = ({ currentCell, onCellClick, isTraining, cellError, fontSize = 'medium', onCellDirectionReady }) => {
+const EyeChart = ({ currentCell, onCellClick, isTraining, cellError, fontSize = 'medium', onCellDirectionReady, showDirectionLabels = false }) => {
   // 生成均匀分布的方向数组
   const generateBalancedDirections = (totalCells) => {
     const directions = Object.values(DIRECTIONS);
@@ -134,9 +134,11 @@ const EyeChart = ({ currentCell, onCellClick, isTraining, cellError, fontSize = 
         >
           E
         </span>
-        <span className="direction-debug">
-          {direction}
-        </span>
+        {showDirectionLabels && (
+          <span className="direction-debug">
+            {direction}
+          </span>
+        )}
       </div>
     );
   };

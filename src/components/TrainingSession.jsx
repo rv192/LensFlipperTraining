@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import EyeChart from './EyeChart';
 import FontSizeSelector from './FontSizeSelector';
+import TrainingDurationSelector from './TrainingDurationSelector';
 import speechService from '../services/speechService';
 import databaseService from '../services/databaseService';
 import audioService from '../services/audioService';
@@ -9,7 +10,7 @@ import alicloudTokenService from '../services/alicloudTokenService';
 import logService from '../services/logService';
 import { ALICLOUD_CONFIG, validateConfig } from '../utils/alicloudConfig';
 import AlicloudConfig from './AlicloudConfig';
-import { TRAINING_CONFIG, DIRECTIONS, COMMON_MISTAKES } from '../utils/constants';
+import { TRAINING_CONFIG, DIRECTIONS, COMMON_MISTAKES, TRAINING_DURATION_OPTIONS } from '../utils/constants';
 import { getGridConfig } from '../utils/responsive';
 import './TrainingSession.css';
 import packageJson from '../../package.json';
@@ -50,6 +51,11 @@ const TrainingSession = ({ onSessionEnd }) => {
   const [showDirectionLabels, setShowDirectionLabels] = useState(() => {
     // 从localStorage读取是否显示方向字母的设置，默认不显示
     return localStorage.getItem('eyeChart-showDirectionLabels') === 'true';
+  });
+  const [trainingDuration, setTrainingDuration] = useState(() => {
+    // 从localStorage读取保存的训练时长设置，默认2分钟
+    const savedDuration = localStorage.getItem('eyeChart-trainingDuration');
+    return savedDuration ? parseInt(savedDuration) : TRAINING_CONFIG.DURATION;
   });
 
   // 检查是否启用调试模式（URL包含/debug）
@@ -102,6 +108,13 @@ const TrainingSession = ({ onSessionEnd }) => {
   useEffect(() => {
     audioService.setEnabled(soundEnabled);
   }, [soundEnabled]);
+
+  // 监听训练时长变化，更新剩余时间（仅在非训练状态下）
+  useEffect(() => {
+    if (!isTraining) {
+      setTimeLeft(trainingDuration);
+    }
+  }, [trainingDuration, isTraining]);
 
   // 初始化阿里云配置
   useEffect(() => {
@@ -186,6 +199,13 @@ const TrainingSession = ({ onSessionEnd }) => {
     });
   };
 
+  // 处理训练时长变化
+  const handleTrainingDurationChange = (newDuration) => {
+    setTrainingDuration(newDuration);
+    localStorage.setItem('eyeChart-trainingDuration', newDuration);
+    console.log('训练时长已更改为:', newDuration, '秒');
+  };
+
   // 生成随机格子 - 从网格中选择已存在的格子
   const generateRandomCell = () => {
     const gridConfig = getGridConfig();
@@ -249,7 +269,7 @@ const TrainingSession = ({ onSessionEnd }) => {
 
       console.log('🚀 设置 isTraining = true');
       setIsTraining(true);
-      setTimeLeft(TRAINING_CONFIG.DURATION);
+      setTimeLeft(trainingDuration);
       setStats({ totalAttempts: 0, correctAnswers: 0, completedCells: 0 });
 
       // 选择第一个格子
@@ -743,7 +763,7 @@ const TrainingSession = ({ onSessionEnd }) => {
     const sessionData = {
       ...currentStats,
       accuracy,
-      duration: TRAINING_CONFIG.DURATION - currentTimeLeft
+      duration: trainingDuration - currentTimeLeft
     };
 
     console.log('最终会话数据:', sessionData);
@@ -791,6 +811,11 @@ const TrainingSession = ({ onSessionEnd }) => {
         </div>
 
         <div className="header-controls">
+          <TrainingDurationSelector
+            currentDuration={trainingDuration}
+            onDurationChange={handleTrainingDurationChange}
+            disabled={isTraining}
+          />
           <FontSizeSelector
             currentSize={fontSize}
             onSizeChange={handleFontSizeChange}

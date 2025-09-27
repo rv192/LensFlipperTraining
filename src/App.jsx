@@ -70,8 +70,8 @@ function App() {
           <div className="feature-item">
             <div className="feature-icon">⏱️</div>
             <div className="feature-text">
-              <h3>2分钟训练</h3>
-              <p>标准训练时长，实时统计正确率</p>
+              <h3>自定义时长训练</h3>
+              <p>可调整训练时长，实时统计正确率</p>
             </div>
           </div>
         </div>

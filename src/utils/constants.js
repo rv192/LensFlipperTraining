@@ -101,6 +101,14 @@ export const TRAINING_CONFIG = {
   AUDIO_TIMEOUT: 5000, // 5秒录音超时
 };
 
+// 训练时长选项
+export const TRAINING_DURATION_OPTIONS = {
+  60: { name: '1分钟', seconds: 60 },
+  120: { name: '2分钟', seconds: 120 },
+  180: { name: '3分钟', seconds: 180 },
+  300: { name: '5分钟', seconds: 300 }
+};
+
 // E字母大小配置
 export const FONT_SIZE_CONFIG = {
   extraSmall: {
